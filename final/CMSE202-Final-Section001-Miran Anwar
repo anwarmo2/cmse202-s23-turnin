@@ -1,0 +1,282 @@
+# CMSE 202 Final Exam (Sect. 001 -- Spring 2023)
+
+### <p style="text-align: right;"> &#9989; Miran Anwar</p>
+### <p style="text-align: right;"> &#9989; anwarmo2</p>
+
+---
+The goal of this final is to give you the opportunity to test out some of the skills that you've developed this semester. In particular, you'll reflect on what you know about writing code using Python and showcase some of your new programming skills.
+
+**Important note about using online resources:** This exam is "open internet". That means that you can look up documentation, google how to accomplish certain Python tasks, etc. Being able to effectively use the internet for computational modeling and data science is a very important skill, so we want to make sure you have the opportunity to exercise that skill. **However, the use of any person-to-person communication software is absolutely not acceptable.**
+
+**Do your own work.** This final is designed to give you the opportunity to show the instructor what you can do and you should hold yourself accountable for maintaining a high level of academic integrity. Any violation of academic integrity could result in you receiving a zero on the final.
+
+You are encouraged to look through the entire exam before you get started so that you can appropriately budget your time and understand the broad goals of the exam.
+
+
+While the exam will be *open* for 8 hours, **you should only take two hours on the exam.** The exam was written to take two hours. We'll be going on the honor system for this. There are times when instructors will be available to answer questions. 
+
+If you cannot complete the code or your cells do not run, just provide your code **as complete as possible**.
+
+
+### Content Knowledge Tested
+- Using Github to save and track progress on your work
+- Effectively visualizing data
+- Using ML tools to create a classification model
+- Quantitatively evaluating classification models
+
+---
+## Part 0: Academic integrity statement
+
+Read the following statement and edit the markdown text to put your name in the statement. This is your commitment to doing your own authentic work on this exam.
+
+> I, Miran Anwar, affirm that this exam represents my own authetic work, without the use of any unpermitted aids or resources or person-to-person communication. I understand that this exam is an opportunity to showcase my own progress in developing and improving my computational skills and have done my best to demonstrate those skills.
+
+**Record the time you start here in the next cell:**
+
+11:00AM
+
+---
+## Part 1: Add to your Git repository to track your progress on your exam (10 points total)
+
+Before you get to far along in the exam, you're going to add it to the `cmse202-S23-turnin` repository you created in class so that you can track your progress on the exam and preserve the final version that you turn in. In order to do this you need to
+
+### Part 1.1 (4 Points)
+
+1. Navigate to your `cmse202-S23-turnin` repository and create a new directory called `final`.
+2. Move this notebook into that **new directory** in your repository, then **add it and commit it to your repository**.
+3. Finally, to test that everything is working, "git push" the file so that it ends up in your GitHub repository.
+
+**Important**: Double check you've added your Professor and your TA as collaborators to your "turnin" respository (you should have done this in the previous homework assignment).
+
+**Also important**: Make sure that the version of this notebook that you are working on is the same one that you just added to your repository! If you are working on a different copy of the noteobok, **none of your changes will be tracked**!
+
+The file should now show up on your GitHub account in the `cmse202-S23-turnin` repository inside the `final` directory you just created.  Periodically, **you'll be asked to commit your changes to the repository and push them to the remote GitHub location**. It can be good to get into a habit of committing your changes any time you make a significant modification.
+
+---
+## Part 2 (10 Points)
+
+For this exam, you’ll be working with a data set that contains measurements of the physical characteristics of three penguin species (e.g., culmen legnth, culmen depth, flipper length, and body mass). This data set is modified from the one associated with a research article (https://journals.plos.org/plosone/article?id=10.1371/journal.pone.0090081). We’ll ask you a set of questions that center the classification of these penguins using techniques you’ve worked with in class and on the homework. 
+
+<img src="
+https://pbs.twimg.com/media/EaAWkZ0U4AA1CQf?format=jpg&name=4096x4096" border="0" align="center" width="800">
+
+<img src="https://pbs.twimg.com/media/EaAXQn8U4AAoKUj?format=jpg&name=4096x4096" border="0" align="center" width="400">
+images found online.
+
+To get started, let’s grab the dataset we’ll be working with.
+
+**(2 pt) Use the following URL to download the dataset.**
+
+`https://raw.githubusercontent.com/huichiayu/cmse_202_802/main/data/Penguin_data.csv`
+
+## your code
+
+import requests
+
+url = 'https://raw.githubusercontent.com/huichiayu/cmse_202_802/main/data/Penguin_data.csv'
+filename = 'Penguin_data.csv'
+
+response = requests.get(url)
+
+with open(filename, 'wb') as f:
+    f.write(response.content)
+
+**(3 pt) Import the dataset in the cell below.** Examine the data and see what features are in the data.
+
+## your code
+
+import pandas as pd
+
+# Reading zoo.csv into a DataFrame
+df = pd.read_csv('Penguin_data.csv')
+
+**(5 pt) Now let's extract the useful data for classification.** Create a new data frame that contains only culmen lenth, culmen depth, flipper length, body mass, and species.
+
+
+## your code 
+
+# Create a new DataFrame with only the selected columns
+new_df = df[["Species", "CulmenLength(mm)", "CulmenDepth(mm)", "FlipperLength(mm)", "BodyMass(g)"]]
+
+# Display the new DataFrame
+new_df
+
+
+---
+## Part 3 (15 Points)
+
+Use Seaborn to make a visualization showing the distributions (i.e.,scatterplots) of each of the different penguin characteristics. Your visualization should represent each of the different penguin species/classes as a different color. This should all be a single figure. Use the [**examples in the seaborn gallery**](https://seaborn.pydata.org/examples/index.html) to help you find the right type of figure. (Note: There are several types of figures that will work for this.)
+
+import seaborn as sns
+import pandas as pd
+
+# select columns of interest
+cols = ['Species', 'CulmenLength(mm)', 'CulmenDepth(mm)', 'FlipperLength(mm)', 'BodyMass(g)']
+penguins = new_df[cols]
+
+# plot scatterplots for each characteristic
+sns.pairplot(data=penguins, hue='Species')
+
+
+## Part 4 (10 Points)
+
+Look at the distributions of the data. Without doing any model fitting (i.e., just by eye), which pair of measured characteristics do you think would be **easiest** for an ML technique to differentiate between? Which pair of seeds do you believe would be **hardest** to separate? **Why?** Justify your answers using your visualization.
+
+The easiest pair of measured characteristics to differnetiate between for an ML technique would be CulmenLength and CulmenDepth. This is because we can see a clear divide between the species here. 
+The hardest would be FlipperLength and BodyMass as Adelie and Chinstrap are almost overlapping. Important obesrvation is that Adelie and Chinstrap are overlapping in most data pairs but here ever Gentoo has some overlap.
+
+---
+### &#128721; STOP (2 points)
+**Pause to commit your changes to your Git repository!**
+
+Take a moment to save your notebook, commit and push the changes to your Git repository.
+
+---
+
+## Part 5 (5 Points)
+
+Split the data into a training and testing set. Pick a reasonable train size. 
+Also, for `random_state`, if your birthday is on an odd date of a month, set it to be 35. Otherwise, set it to 42.
+
+from sklearn.model_selection import train_test_split
+
+data= new_df.drop('Species', axis=1)
+target=new_df['Species']
+X_train, X_test, y_train, y_test = train_test_split(data, target, train_size=0.8, random_state=35)
+
+
+
+---
+## Part 6 (20 Points)
+
+Create and train a SVM model for classifying the data. **Note:** You may get multiple warnings when creating your model (warnings are *pink*). You may also get a warning about a failure to converge. It is fine to ignore these warnings. 
+
+from sklearn.svm import SVC
+
+# Create the SVM model object
+model = SVC(kernel='linear', C=1, random_state=35)
+
+# Train the SVM model using the training data
+model.fit(X_train, y_train)
+
+
+
+
+---
+## Part 7 (5 Points)
+
+**Evaluate your model by finding the accuracy, recall, precision, and confusion matrix using the test data.**
+
+from sklearn import metrics
+
+# predict the class labels for the test set
+y_pred = model.predict(X_test)
+
+# compute evaluation metrics
+accuracy = metrics.accuracy_score(y_test, y_pred)
+recall = metrics.recall_score(y_test, y_pred, average='macro')
+precision = metrics.precision_score(y_test, y_pred, average='macro')
+confusion_matrix = metrics.confusion_matrix(y_test, y_pred)
+
+# print the evaluation metrics
+print("Accuracy:", accuracy)
+print("Recall:", recall)
+print("Precision:", precision)
+print("Confusion Matrix:\n", confusion_matrix)
+
+
+---
+### &#128721; STOP (2 points)
+**Pause to commit your changes to your Git repository!**
+
+Take a moment to save your notebook, commit and push the changes to your Git repository.
+
+---
+
+
+## Part 8 (7 Points)
+
+I caught a penguin. It has a short (40 mm in length) and mediate-thick (17 mm in depth) bill. Its flippers are short (190 mm). It's kinda skinny, weighing 3000 g, What is its species determined by your classifier?
+
+# create a new penguin with the given characteristics
+new_penguin = {'bill_length_mm': 40, 'bill_depth_mm': 17, 'flipper_length_mm': 190, 'body_mass_g': 3000}
+
+# convert the dictionary to a dataframe
+new_penguin_df = pd.DataFrame([new_penguin])
+
+# use the trained model to make predictions on the new penguin
+predicted_species = model.predict(new_penguin_df)
+
+# print the predicted species
+print(predicted_species)
+
+
+
+
+It is Adelie
+
+---
+## Part 9 (7 Points)
+
+**Let's try to use `LogisticRegression` function in sklearn to classify the same data.** Note that we are **not** using `statsmodels` here. Import logistic regression function from sklearn and build logistic regression model to classify the penguin data.
+
+from sklearn.linear_model import LogisticRegression
+
+# create an instance of the model
+model = LogisticRegression(max_iter=1000, random_state=35)
+
+# fit the model to the training data
+model.fit(X_train, y_train)
+
+
+---
+## Part 10 (3 Points)
+
+**Evaluate your model by finding the accuracy, recall, precision, and confusion matrix using the test data.**
+
+
+from sklearn import metrics
+
+# predict the class labels for the test set
+y_pred = model.predict(X_test)
+
+# compute evaluation metrics
+accuracy = metrics.accuracy_score(y_test, y_pred)
+recall = metrics.recall_score(y_test, y_pred, average='macro')
+precision = metrics.precision_score(y_test, y_pred, average='macro')
+confusion_matrix = metrics.confusion_matrix(y_test, y_pred)
+
+# print the evaluation metrics
+print("Accuracy:", accuracy)
+print("Recall:", recall)
+print("Precision:", precision)
+print("Confusion Matrix:\n", confusion_matrix)
+
+
+**Compare to SVM, does Logisitic Regression give better result?**
+
+Yes, Logistic regression gave better results here looking a the accuracy, etc scores calculated above
+
+
+---
+## Part 11 (8 Points)
+Reflect on you have learned  in this class. What can we do to improve the accuracy of the classifiers? 
+
+1. Data preparation is important
+2. Choosing the right algorithm is very critical to getting the best results
+3. Evaluating the model is essential to optimize the accuracy of the classifier
+We can try colllecting more data and also improving the quality of the data to improve the accuracy of thr classifiers. There is also a way to combine multiple models to improve the accuracy.
+
+---
+### &#128721; STOP (2 points)
+**Pause to commit your changes to your Git repository!**
+
+Take a moment to save your notebook, commit and push the changes to your Git repository.
+
+---
+**Record the time you finish here in the next cell.**
+
+12:45
+
+## You're done! Congrats on finishing CMSE 202!
+Don't forget to also upload this file to D2L drop box.
